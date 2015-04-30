@@ -1,0 +1,81 @@
+<!doctype HTML>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script type="text/javascript" src="js/webpd-latest.js"></script>
+    <script type="text/javascript" src="js/nexusUI.js"></script>
+    <script type="text/javascript">
+
+      var patch
+      $.get('pd/basic.pd', function(mainStr) {
+        // Loading and starting the patch
+        patch = Pd.loadPatch(mainStr)
+        Pd.start()
+
+        Pd.send('panL', [0.5])
+        Pd.send('panR', [0.5])
+
+        // Rendering the patch as SVG
+        $('#svg').html(pdfu.renderSvg(pdfu.parse(mainStr), {svgFile: false, ratio: 1.5}))
+      })
+
+      nx.onload = function() {
+      
+        tempo.on('value',function(data) {
+            Pd.send('tempo', [data*-20])
+        })
+      
+        octave.on('value',function(data) {
+            Pd.send('octave', [data*1000])
+        })
+      
+        pan.on('value',function(data) {
+            var L = nx.scale(data,-1,1,1,0)
+            var R = nx.scale(data,-1,1,0,1)
+            Pd.send('panL', [L])
+            Pd.send('panR', [R])
+        })
+          
+      }
+
+    </script>
+
+  </head>
+
+  <body>
+
+    <style>
+
+      body {
+        text-align:center;
+      } 
+
+      #tempo, #octave {
+        width:100px;
+        height:100px;
+      }
+
+      #pan {
+        height:50px;
+        width:300px;
+      }
+
+    </style>
+
+    <h1 style="font-family:helvetica neue;font-weight:300">NexusUI + WebPD demo</h1>
+
+    <br><br>
+
+    <canvas nx="dial" id="tempo"></canvas>
+    <canvas nx="dial" id="octave"></canvas><br>
+    <canvas nx="crossfade"id="pan"></canvas>
+
+    <br><br><br>
+
+    <div id="pdfuNote">Patch rendered to SVG using <a href="https://github.com/sebpiq/pd-fileutils">pd-fileutils</a></div>
+    <div id="svg"></div>
+
+  </body>
+</html>
