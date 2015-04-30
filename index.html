@@ -1,0 +1,131 @@
+<!doctype HTML>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script type="text/javascript" src="js/webpd-latest.js"></script>
+    <script type="text/javascript" src="js/nexusUI.js"></script>
+    <script type="text/javascript">
+      var patch
+      $.get('pd/mbira.pd', function(mainStr) {
+        // Loading and starting the patch
+        patch = Pd.loadPatch(mainStr)
+        Pd.start()
+
+        Pd.send('loadfile', [1])
+
+        // Rendering the patch as SVG
+        $('#svg').html(pdfu.renderSvg(pdfu.parse(mainStr), {svgFile: false, ratio: 1.5}))
+      })
+
+    </script>
+
+    <style>
+      svg text {
+        font-size: 80%;
+      }
+      #pdfuNote {
+        text-align: right;
+      }
+    </style>
+
+  </head>
+
+  <body style="text-align:center">
+
+    <style> 
+    .mbira {
+      width:100px;
+      height:100px;
+    }
+    </style>
+
+    <h1 style="font-family:helvetica neue;font-weight:300">NexusUI + WebPD demo</h1>
+
+    <br><br>
+
+    <canvas nx="button" class="mbira"></canvas>
+    <canvas nx="button" class="mbira"></canvas>
+    <canvas nx="button" class="mbira"></canvas>
+    <canvas nx="button" class="mbira"></canvas>
+
+    <br><br><br>
+    <script>
+      nx.onload = function() {
+       // button1.on('press',function(data) {
+      //  })
+
+        button1.mode = "node"
+        button2.mode = "node"
+        button3.mode = "node"
+        button4.mode = "node"
+
+        button1.on('*',function(data) {
+          if (data.y) {
+            var vol = nx.scale(data.y,0,this.height/2,1,0)
+            vol = nx.clip(vol,0,1)
+            Pd.send('vol1', [vol])
+          }
+          if (data.press) {
+            var speed = Math.floor(data.x / (this.width/6))
+            speed = Math.pow(2,speed)
+            speed *= 2000
+            Pd.send('play1', [speed])
+          }
+        })
+
+        button2.on('*',function(data) {
+          if (data.y) {
+            var vol = nx.scale(data.y,0,this.height/2,1,0)
+            vol = nx.clip(vol,0,1)
+            Pd.send('vol2', [vol])
+          }
+          if (data.press) {
+            var speed = Math.floor(data.x / (this.width/6))
+            speed = Math.pow(2,speed)
+            console.log(speed)
+            speed *= 1750
+            Pd.send('play2', [speed])
+          }
+        })
+
+
+
+        button3.on('*',function(data) {
+          if (data.y) {
+            var vol = nx.scale(data.y,0,this.height/2,1,0)
+            vol = nx.clip(vol,0,1)
+            Pd.send('vol3', [vol])
+          }
+          if (data.press) {
+            var speed = Math.floor(data.x / (this.width/6))
+            speed = Math.pow(2,speed)
+            speed *= 1500
+            Pd.send('play3', [speed])
+          }
+        })
+
+
+        button4.on('*',function(data) {
+          if (data.y) {
+            var vol = nx.scale(data.y,0,this.height/2,1,0)
+            vol = nx.clip(vol,0,1)
+            Pd.send('vol4', [vol])
+          }
+          if (data.press) {
+            var speed = Math.floor(data.x / (this.width/6))
+            speed = Math.pow(2,speed)
+            speed *= 1333
+            Pd.send('play4', [speed])
+          }
+        })
+          
+      }
+    </script>
+
+    <div id="pdfuNote">Patch rendered to SVG using <a href="https://github.com/sebpiq/pd-fileutils">pd-fileutils</a></div>
+    <div id="svg"></div>
+
+  </body>
+</html>
